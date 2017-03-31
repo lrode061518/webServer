@@ -28,6 +28,7 @@ class taipei(city):
             # check in current city
             if not self.valid_city(val.lat, val.lng):
                 print 'not in the correspond city'
+                self.ret.code = UB_NOT_IN_CITY
                 break
 
             # Start processing -
@@ -40,13 +41,15 @@ class taipei(city):
 
         web.header('Content-Type', 'application/json; charset=utf-8', unique=True)
 
-        return json.dumps(self.ret.__dict__)
+        return json.dumps(self.ret.__dict__, ensure_ascii=False)
 
 if __name__ == "__main__":
-    app = web.application(urls, globals())
-    response = app.request('/v1/ubike-station/taipei?lat=25.034153&lng=121.568509')
+    import sys
+    sys.argv.append('8090')
+    app = web.application(urls,  globals())
+    # response = app.request('/v1/ubike-station/taipei?lat=25.034153&lng=121.568509')
 
-    print response.data
-    print response.status
-    print response.headers['Content-Type']
-    #app.run()
+    # print response.data
+    # print response.status
+    # print response.headers['Content-Type']
+    app.run()

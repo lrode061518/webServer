@@ -22,7 +22,6 @@ def updateDB():
         dicBike = json.loads(data)
 
         # update db
-
         if dicBike['retCode'] != 1 :
             raise Exception('return status error with code {}'.format(dicBike['retCode']))
 
