@@ -1,9 +1,9 @@
+#!/usr/bin/python
+# coding:utf-8
 import web
 from includes.define import *
 from city   import *
-
-def find2nearest(lat, lng):
-    pass
+from database import *
 
 class index:
     def GET(self):
@@ -23,7 +23,7 @@ class taipei(city):
             # check latitude & longitude
             if not valid_latlng(val.lat, val.lng):
                 print 'invalid latlng'
-                self.result.code = UB_INVALID_LATLNG
+                self.ret.code = UB_INVALID_LATLNG
                 break
             # check in current city
             if not self.valid_city(val.lat, val.lng):
@@ -31,13 +31,22 @@ class taipei(city):
                 break
 
             # Start processing -
-            find2nearest(val.lat, val.lng)
+            reqlist = findnearest(float(val.lat), float(val.lng) )
 
+            self.ret.result = reqlist
 
             break
 
-        return self.result.__dict__
+
+        web.header('Content-Type', 'application/json; charset=utf-8', unique=True)
+
+        return json.dumps(self.ret.__dict__)
 
 if __name__ == "__main__":
     app = web.application(urls, globals())
-    app.run()
+    response = app.request('/v1/ubike-station/taipei?lat=25.034153&lng=121.568509')
+
+    print response.data
+    print response.status
+    print response.headers['Content-Type']
+    #app.run()

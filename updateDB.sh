@@ -1,1 +1,1 @@
-python update.py
+python database.py -U

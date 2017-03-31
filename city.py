@@ -10,7 +10,7 @@ class resultHandler:
 class city:
     def __init__(self):
         self.city   = ''
-        self.result = resultHandler()
+        self.ret = resultHandler()
 
     def valid_city(self, lat, lng):
         # using google geocoding APIs
