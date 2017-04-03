@@ -1,18 +1,57 @@
 import json
 import httplib
-from includes.define import *
+import web
+from includes.define import RETCODE, API, invalid_latlng
+from database import allStationsFull, findnearest
 
 class resultHandler:
     def __init__(self):
-        self.code   = UB_SUCCESS
+        self.code   = RETCODE.SUCCESS
         self.result = []
 
 class city:
     def __init__(self):
-        self.city   = ''
-        self.ret = resultHandler()
+        self.ret         = resultHandler()
+        self.city        = ''
+        self.searchLimit = 2
 
-    def valid_city(self, lat, lng):
+    def GET(self):
+
+        web.header('Content-Type', 'application/json; charset=utf-8', unique=True)
+        while True:
+            val = web.input(lat = '', lng = '')
+
+            # Err check -
+            # check latitude & longitude
+            if invalid_latlng( float(val.lat), float(val.lng)):
+                print 'invalid latlng'
+                self.ret.code = RETCODE.INVALID_LATLNG
+                break
+            # check in current city
+            if not self.in_the_city(val.lat, val.lng):
+                print 'not in the correspond city'
+                self.ret.code = RETCODE.NOT_IN_CITY
+                break
+            # check all station status
+            if allStationsFull():
+                print 'All stations are full now'
+                self.ret.code = RETCODE.ALL_FULL
+                break
+
+            # Start processing -
+            reqlist = findnearest(float(val.lat), float(val.lng), self.searchLimit )
+
+            self.ret.result = reqlist
+            
+            if not reqlist:
+                print 'No station available...'
+                #self.ret.code = RETCODE.ALL_EMPTY ??
+
+            break
+
+        return json.dumps(self.ret.__dict__, ensure_ascii=False)
+
+    def in_the_city(self, lat, lng):
         # using google geocoding APIs
         if not self.city:
             print 'undefined city'
@@ -22,8 +61,8 @@ class city:
 
         try:
             conn = None
-            conn = httplib.HTTPSConnection(GOOGLE_MAPS_API, httplib.HTTPS_PORT)
-            conn.request('GET', '/maps/api/geocode/json?latlng=' + str(lat) + ',' + str(lng) )
+            conn = httplib.HTTPSConnection( API.GOOGLE_MAPS, httplib.HTTPS_PORT )
+            conn.request('GET', API.GOOGLE_GEOMAP_LAT_LNG.format( lat , lng ))
 
             response = conn.getresponse()
             if response.status != httplib.OK:
@@ -44,7 +83,7 @@ class city:
         except Exception, err:
             print 'Exception occur'
             print err
-            self.result.code = UB_SYSTEM_ERR
+            self.result.code = RETCODE.SYSTEM_ERR
             valid = False
         finally:
             if conn:

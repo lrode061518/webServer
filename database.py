@@ -1,54 +1,50 @@
-import sys
+import sys, os
 import gzip
 import urllib
 import json
 from pymongo import MongoClient
-from includes.define import *
+from includes.define import API ,DOC_KEY, UB, \
+                            DB_NAME, COLLECTION_NAME, \
+                            TEMP_GZ_FILE
 
-NAME = u'name'
-LOC  = u'loc'
-TOT  = u'total'
-CUR  = u'curr'
-ENA  = u'enabled'
+def getBikeData():
+    urllib.urlretrieve(API.DATA_TAIPEI_UBIKE, TEMP_GZ_FILE)
+    f = gzip.open(TEMP_GZ_FILE, 'r')
+    data = f.read()
+    f.close()
+    return data
 
 def updateDB():
     try:
         # get new data
-        urllib.urlretrieve(DATA_TAIPEI_UBIKE, TEMP_GZ_FILE)
-        f = gzip.open(TEMP_GZ_FILE, 'r')
-        data = f.read()
-        f.close()
-        #print data
+        data = getBikeData()
         dicBike = json.loads(data)
 
         # update db
-        if dicBike['retCode'] != 1 :
+        if dicBike[ UB.RETURN_CODE ] != UB.RET_OK :
             raise Exception('return status error with code {}'.format(dicBike['retCode']))
 
-        resultObj = dicBike['retVal']
+        resultObj = dicBike[ UB.RETURN_VALUE ]
 
         for attr, value in resultObj.iteritems():
-            print 'start adding'
-            print type( value['sna'] )
-            print value['sna']
-            doc = {
-                    NAME    : value['sna'].encode('utf-8'),
-                    LOC     : {
-                                    u'type' : u'Point',
-                                    u'coordinates' : [ float(value['lng']), float(value['lat']) ]
-                                    },
-                    TOT     : int( value['tot'] ),
-                    CUR     : int( value['sbi'] ),
-                    ENA     : True if value['act'] == '1'  else False
-                    }
-            print doc
 
-            print 'with station :  '+(value[u'sna'])
-            if collection.count({ NAME : doc[NAME] }) :
-                print 'find_one_and_update'
-                collection.find_one_and_update( { NAME : doc[NAME] } , { u'$set' : doc } )
+            doc = {
+                    DOC_KEY.NAME    : value[ UB.STATION_NAME ].encode('utf-8'),
+                    DOC_KEY.LOC     : {
+                                        'type' : 'Point',
+                                        'coordinates' : [ float(value['lng']), float(value['lat']) ]
+                                        },
+                    DOC_KEY.TOT     : int( value[ UB.TOTAL_BIKES ] ),
+                    DOC_KEY.CUR     : int( value[ UB.CURRENT_BIKES ] ),
+                    DOC_KEY.ENA     : True if value[ UB.STATION_STATUS ] == UB.STAT_OK  else False
+                    }
+
+            if collection.count({ DOC_KEY.NAME : doc[DOC_KEY.NAME] }) :
+                collection.find_one_and_update( 
+                                                { DOC_KEY.NAME : doc[DOC_KEY.NAME] } , 
+                                                { '$set' : doc } 
+                                                )
             else:
-                print 'insert_one'
                 collection.insert_one(doc)
 
 
@@ -56,13 +52,19 @@ def updateDB():
         print 'Get Bike exception'
         print err
     finally:
-        pass
+        if os.path.exists(TEMP_GZ_FILE):
+            os.remove(TEMP_GZ_FILE)
 
-def findnearest(lat, lng, count = 2):
+def allStationsFull():
+    return True if collection.find( 
+        {   '$where' : 'this.{} === this.{}'.format(DOC_KEY.TOT, DOC_KEY.CUR) }
+        ).count() > 0 else False
+
+def findnearest(lat, lng, count):
     reqlist = []
-    print 'start finding nearest {} stations'.format(count)
-    for l in collection.find( {
-        LOC : {
+    print 'start finding nearest {} station(s)'.format(count)
+    for doc in collection.find( {
+        DOC_KEY.LOC : {
             '$near' :  {
                 '$geometry': {
                     'type': 'Point',
@@ -72,30 +74,33 @@ def findnearest(lat, lng, count = 2):
             }
         } ):
 
-        print u'find station {}'.format( l[NAME] )
+        print u'find station {}'.format( doc[ DOC_KEY.NAME ] )
 
-        if not l[ENA]:
+        if not doc[ DOC_KEY.ENA ]:
             print ' but not able to used ...'
             continue
 
-        if l[CUR] <= 0:
+        if doc[ DOC_KEY.CUR ] <= 0:
             print ' but current no bikes ...'
             continue
 
-        reqlist.append( { 'station' : l[NAME], 'num_ubike' : l[TOT] - l[CUR] } )
+        reqlist.append( { 
+            'station' : doc[ DOC_KEY.NAME ],
+            'num_ubike' : doc[ DOC_KEY.TOT ] - doc[ DOC_KEY.CUR ]
+            } )
+
         count -= 1
 
         if not count:
             break
 
-    print 'find {} stations'.format(len(reqlist))
     return reqlist
 
 
 # create db client
 client = MongoClient()
-db = client.bike_db
-collection = db.bike_collection
+db = client[ DB_NAME ]
+collection = db[ COLLECTION_NAME ]
 collection.create_index( [( 'loc' , '2dsphere' )] )
 
 
