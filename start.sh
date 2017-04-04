@@ -10,7 +10,6 @@ MONGODB_LOG=`pwd`/data/mongod.log
 #mongod --dbpath $MONGODB_PATH --fork --logpath $MONGODB_LOG #&
 
 
-if [ True ]; then
 # workaround to register/unregister updateDB work 
 crontab -l > $ORIGIN_CRONTAB
 cp $ORIGIN_CRONTAB $TEMP_CRONTAB
@@ -19,10 +18,11 @@ crontab $TEMP_CRONTAB
 fi
 
 # start server
-python mainServer.py
+python database.py -U
+python mainServer.py &
 
 # stop routine work
 crontab origin.cr
 rm $TEMP_CRONTAB $ORIGIN_CRONTAB
-
+fi
 # terminate
