@@ -97,10 +97,12 @@ def findnearest(lat, lng, count):
 
 # create db client
 if 'MONGODB_URI' in os.environ:
+    import boto.s3.connection import S3Connection
+    MONGODB_URI = S3Connection( os.environ['MONGODB_URI'])
     client = MongoClient(MONGODB_URI)
 else:
     client = MongoClient()
-    
+
 db = client[ DB_NAME ]
 collection = db[ COLLECTION_NAME ]
 collection.create_index( [( 'loc' , '2dsphere' )] )
