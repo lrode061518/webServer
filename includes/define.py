@@ -42,7 +42,11 @@ urls = (
     '/v1/ubike-station/taipei', 'taipei'
 )
 
-DB_NAME = 'bike_db'
+import os
+if 'MONGODB_URI' in os.environ:
+	DB_NAME = 'heroku_35nzq90c'
+else:
+	DB_NAME = 'bike_db'
 COLLECTION_NAME = 'bike_collection'
 TEMP_GZ_FILE = 'tmp.gz'
 DEFAULT_ADDR = '127.0.0.1'
