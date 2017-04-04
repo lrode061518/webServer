@@ -19,7 +19,7 @@ crontab $TEMP_CRONTAB
 fi
 
 # start server
-python webserver.py
+python mainServer.py
 
 # stop routine work
 crontab origin.cr
