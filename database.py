@@ -72,7 +72,7 @@ def findnearest(lat, lng, count):
             }
         } ):
 
-        print u'find station {}'.format( doc[ DOC_KEY.NAME ] )
+        #print u'find station {}'.format( doc[ DOC_KEY.NAME ] )
 
         if not doc[ DOC_KEY.ENA ]:
             print ' but not able to used ...'
