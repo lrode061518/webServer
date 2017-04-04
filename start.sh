@@ -19,7 +19,7 @@
 
 # start server
 python database.py -U
-python mainServer.py &
+python mainServer.py
 
 # if [False]; then
 # # stop routine work
