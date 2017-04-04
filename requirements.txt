@@ -1,4 +1,5 @@
 appdirs==1.4.3
+boto==2.46.1
 packaging==16.8
 pymongo==3.4.0
 pyparsing==2.2.0
