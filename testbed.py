@@ -3,8 +3,9 @@ import httplib
 import json
 from includes.define import DEFAULT_ADDR, DEFAULT_PORT, RETCODE
 
+TEST_SERVER_ADDR = DEFAULT_ADDR
+TEST_SERVER_PORT = str(DEFAULT_PORT)
 TEST_URL = '/v1/ubike-station/taipei?lat={}&lng={}'
-
 
 INVALID_LATLNG_LIST = [
 	( -29.100201 , 184.223383 ),    # invalid longitude
@@ -21,6 +22,7 @@ NON_TAIPEI_LOC_LIST = [
 ]
 
 TAIPEI_LOCATIONS_LIST = [
+	( 25.034153 , 121.568509 ),
 	( 25.168711 , 121.446996 ),
 	( 25.061145 , 121.532444 )
 ]
@@ -28,7 +30,7 @@ TAIPEI_LOCATIONS_LIST = [
 class mainServerTest(unittest.TestCase):
 	def request(self, lat, lng):
 		try:
-			conn = httplib.HTTPConnection( DEFAULT_ADDR, str(DEFAULT_PORT) )
+			conn = httplib.HTTPConnection( TEST_SERVER_ADDR, TEST_SERVER_PORT )
 			conn.request('GET', TEST_URL.format( lat , lng ))
 			response = conn.getresponse()
 			return json.loads(response.read())
