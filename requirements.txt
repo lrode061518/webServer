@@ -1,2 +1,2 @@
-MongoDB==3.4.3
+MongoDB==3.0
 webpy==0.38
