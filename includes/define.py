@@ -51,7 +51,7 @@ COLLECTION_NAME = 'bike_collection'
 TEMP_GZ_FILE = 'tmp.gz'
 DEFAULT_ADDR = '0.0.0.0'
 if 'PORT' in os.environ:
-	DEFAULT_PORT = os.environ['PORT']
+	DEFAULT_PORT = int( os.environ['PORT'] )
 else:
 	DEFAULT_PORT = 8080
 
