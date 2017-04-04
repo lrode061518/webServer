@@ -97,8 +97,7 @@ def findnearest(lat, lng, count):
 
 # create db client
 if 'MONGODB_URI' in os.environ:
-    from boto.s3.connection import S3Connection
-    MONGODB_URI = S3Connection( os.environ['MONGODB_URI'])
+    MONGODB_URI = os.environ['MONGODB_URI']
     client = MongoClient(MONGODB_URI)
 else:
     client = MongoClient()
