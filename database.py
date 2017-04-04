@@ -12,6 +12,7 @@ def getBikeData():
     f = gzip.open(TEMP_GZ_FILE, 'r')
     data = f.read()
     f.close()
+    os.remove(TEMP_GZ_FILE)
     return data
 
 def updateDB():
@@ -51,9 +52,6 @@ def updateDB():
     except Exception, err:
         print 'Get Bike exception'
         print err
-    finally:
-        if os.path.exists(TEMP_GZ_FILE):
-            os.remove(TEMP_GZ_FILE)
 
 def allStationsFull():
     return True if collection.find( 

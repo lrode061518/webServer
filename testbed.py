@@ -22,8 +22,7 @@ NON_TAIPEI_LOC_LIST = [
 
 TAIPEI_LOCATIONS_LIST = [
 	( 25.168711 , 121.446996 ),
-	( 25.061145 , 121.532444 ),
-	( 25.034153 , 121.568509 )
+	( 25.061145 , 121.532444 )
 ]
 
 class mainServerTest(unittest.TestCase):
@@ -41,13 +40,13 @@ class mainServerTest(unittest.TestCase):
 	def test_invalid_latlng(self):
 		for case in INVALID_LATLNG_LIST:
 			jsonObj = self.request(case[0], case[1])
-			self.assertTrue( jsonObj['code'] == RETCODE.INVALID_LATLNG )
+			self.assertEqual( jsonObj['code'] , RETCODE.INVALID_LATLNG )
 			self.assertFalse( jsonObj['result'] )
 
 	def test_not_in_taipei(self):
 		for case in NON_TAIPEI_LOC_LIST:
 			jsonObj = self.request(case[0], case[1])
-			self.assertTrue( jsonObj['code'] == RETCODE.NOT_IN_CITY )
+			self.assertEqual( jsonObj['code'] , RETCODE.NOT_IN_CITY )
 			self.assertFalse( jsonObj['result'] )
 
 	def test_common(self):
@@ -55,7 +54,8 @@ class mainServerTest(unittest.TestCase):
 		#         maybe create a dummy db
 		for case in TAIPEI_LOCATIONS_LIST:
 			jsonObj = self.request(case[0], case[1])
-			self.assertTrue( jsonObj['code'] == RETCODE.SUCCESS )
+			self.assertEqual( jsonObj['code'] , RETCODE.SUCCESS )
+			self.assertTrue( jsonObj['result'] )
 			for station in jsonObj['result']:
 				self.assertTrue( station['num_ubike'] > 0 )
 		
