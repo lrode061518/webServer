@@ -96,7 +96,11 @@ def findnearest(lat, lng, count):
 
 
 # create db client
-client = MongoClient()
+if 'MONGODB_URI' in os.environ:
+    client = MongoClient(MONGODB_URI)
+else:
+    client = MongoClient()
+    
 db = client[ DB_NAME ]
 collection = db[ COLLECTION_NAME ]
 collection.create_index( [( 'loc' , '2dsphere' )] )

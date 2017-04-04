@@ -7,7 +7,7 @@ MONGODB_PATH=`pwd`/data/db
 MONGODB_LOG=`pwd`/data/mongod.log
 
 # init database
-mongod --dbpath $MONGODB_PATH --fork --logpath $MONGODB_LOG #&
+#mongod --dbpath $MONGODB_PATH --fork --logpath $MONGODB_LOG #&
 
 
 if [ True ]; then
