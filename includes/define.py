@@ -49,10 +49,13 @@ else:
 	DB_NAME = 'bike_db'
 COLLECTION_NAME = 'bike_collection'
 TEMP_GZ_FILE = 'tmp.gz'
+
 if 'PORT' in os.environ:
 	DEFAULT_PORT = int( os.environ['PORT'] )
+	DEFAULT_ADDR = '0.0.0.0'
 else:
 	DEFAULT_PORT = 8090
+	DEFAULT_ADDR = '127.0.0.3'
 
 # As we are current using GooleMaps ... 
 # we follow GoogleMaps' latlngBound as below: 
