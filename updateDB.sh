@@ -1,1 +1,0 @@
-python database.py -U

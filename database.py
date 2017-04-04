@@ -2,6 +2,7 @@ import sys, os
 import gzip
 import urllib
 import json
+import threading
 from pymongo import MongoClient
 from includes.define import API ,DOC_KEY, UB, \
                             DB_NAME, COLLECTION_NAME, \
@@ -52,6 +53,8 @@ def updateDB():
     except Exception, err:
         print 'Get Bike exception'
         print err
+    finally:
+        threading.Timer(60, updateDB).start()
 
 def allStationsFull():
     return True if collection.find( 
@@ -107,14 +110,19 @@ collection = db[ COLLECTION_NAME ]
 collection.create_index( [( 'loc' , '2dsphere' )] )
 
 
-# handle input option
-opt = ''
-argc = len( sys.argv )
-if argc == 2:
-    if sys.argv[1].startswith('-'):
-        opt = sys.argv[1][1:]
-elif argc > 2:
-    print 'Wrong option input ....'
+updateDB()
 
-if opt.upper() == 'U':
-    updateDB()
+
+
+
+# handle input option
+# opt = ''
+# argc = len( sys.argv )
+# if argc == 2:
+#     if sys.argv[1].startswith('-'):
+#         opt = sys.argv[1][1:]
+# elif argc > 2:
+#     print 'Wrong option input ....'
+
+# if opt.upper() == 'U':
+#     updateDB()
