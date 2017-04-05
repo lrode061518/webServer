@@ -54,17 +54,26 @@ if 'PORT' in os.environ:
 	DEFAULT_PORT = int( os.environ['PORT'] )
 	DEFAULT_ADDR = '0.0.0.0'
 else:
-	DEFAULT_PORT = 8090
-	DEFAULT_ADDR = '127.0.0.3'
+	DEFAULT_PORT = 8080
+	DEFAULT_ADDR = '0.0.0.0'
 
-# As we are current using GooleMaps ... 
-# we follow GoogleMaps' latlngBound as below: 
+# As we are current using GooleMaps ...
+# we follow GoogleMaps' latlngBound as below:
 #  Latitude: -85 to +85
 #  Longitude: -180 to +180
 def invalid_latlng(lat, lng):
-	if -85.0 > lat or lat  > 85.0:
-		return True
-	if -180.0 > lng or lng > 180.0:
-		return True
 
-	return False
+    try:
+        lat = float( lat )
+        lng = float( lng )
+    except Exception, err:
+        print err
+        return True
+
+    print 'convert success fat {} lng {}'.format(lat, lng)
+    if -85.0 > lat or lat  > 85.0:
+	    return True
+    if -180.0 > lng or lng > 180.0:
+        return True
+
+    return False
