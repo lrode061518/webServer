@@ -57,9 +57,9 @@ def updateDB():
         threading.Timer(60, updateDB).start()
 
 def allStationsFull():
-    return True if collection.find( 
-        {   '$where' : 'this.{} === this.{}'.format(DOC_KEY.TOT, DOC_KEY.CUR) }
-        ).count() > 0 else False
+    return False if collection.find( 
+        {   '$where' : 'this.{} > this.{}'.format(DOC_KEY.TOT, DOC_KEY.CUR) }
+        ).count() > 0 else True
 
 def findnearest(lat, lng, count):
     reqlist = []
