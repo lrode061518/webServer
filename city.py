@@ -23,7 +23,7 @@ class city:
 
             # Err check -
             # check latitude & longitude
-            if invalid_latlng( float(val.lat), float(val.lng)):
+            if invalid_latlng( val.lat, val.lng):
                 print 'invalid latlng'
                 self.ret.code = RETCODE.INVALID_LATLNG
                 break
@@ -42,7 +42,7 @@ class city:
             reqlist = findnearest(float(val.lat), float(val.lng), self.searchLimit )
 
             self.ret.result = reqlist
-            
+
             if not reqlist:
                 print 'No station available...'
                 #self.ret.code = RETCODE.ALL_EMPTY ??
